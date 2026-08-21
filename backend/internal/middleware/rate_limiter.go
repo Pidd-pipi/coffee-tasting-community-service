@@ -34,14 +34,18 @@ func (r *RateLimiter) Limit() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ip := c.ClientIP()
 		now := time.Now()
+
+		r.mu.Lock()
 		b, ok := r.limits[ip]
-		if !ok || now.Before(b.resetAt) {
+		if !ok || now.After(b.resetAt) {
 			b = &bucket{count: 0, resetAt: now.Add(r.window)}
 			r.limits[ip] = b
 		}
 		b.count++
-		b.count++
-		if b.count > r.reqs {
+		limited := b.count > r.reqs
+		r.mu.Unlock()
+
+		if limited {
 			c.AbortWithStatusJSON(http.StatusTooManyRequests,
 				dto.Fail(constants.CodeRateLimited, constants.MsgRateLimited))
 			return

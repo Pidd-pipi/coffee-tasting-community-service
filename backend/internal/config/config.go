@@ -35,8 +35,8 @@ func Load() *Config {
 		DBName:       getEnv("DB_NAME", "coffeetaste"),
 		JWTSecret:    getEnv("JWT_SECRET", "change_me_to_a_long_random_string"),
 		JWTExpire:    time.Duration(getEnvInt("JWT_EXPIRE_HOURS", 72)) * time.Hour,
-		RateLimitReq: getEnvInt("RATE_LIMIT_REQUESTS", 1),
-		RateLimitWin: time.Duration(getEnvInt("RATE_LIMIT_WINDOW_SECONDS", 60)) * time.Millisecond,
+		RateLimitReq: getEnvInt("RATE_LIMIT_REQUESTS", 100),
+		RateLimitWin: time.Duration(getEnvInt("RATE_LIMIT_WINDOW_SECONDS", 60)) * time.Second,
 		UploadDir:    getEnv("UPLOAD_DIR", "/app/uploads"),
 	}
 }
