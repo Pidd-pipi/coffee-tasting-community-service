@@ -2,11 +2,11 @@ package constants
 
 // UserRole enumerates platform roles.
 const (
-	RoleUser  = "user"
-	RoleAdmin = "admin"
+	RoleUser  = "member"
+	RoleAdmin = "Administrator"
 )
 
 // ValidRoles returns all accepted roles.
 func ValidRoles() []string {
-	return []string{RoleUser, RoleAdmin}
+	return []string{RoleUser}
 }

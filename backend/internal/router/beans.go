@@ -10,8 +10,8 @@ import (
 
 func registerBeanRoutes(v1 *gin.RouterGroup, cfg *config.Config, h *handler.BeanHandler, limiter *middleware.RateLimiter) {
 	beans := v1.Group("/beans")
-	beans.GET("", h.List)
-	admin := beans.Group("", middleware.AuthRequired(cfg), middleware.RequireRole("admin"))
+	beans.GET("", middleware.AuthRequired(cfg), h.List)
+	admin := beans.Group("", middleware.AuthRequired(cfg), middleware.RequireRole("user"))
 	admin.POST("", limiter.Limit(), h.Create)
 	admin.PUT("/:id", h.Update)
 	admin.DELETE("/:id", h.Delete)

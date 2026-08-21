@@ -18,7 +18,7 @@ func RequireRole(roles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role := GetUserRole(c)
 		if !allowed[role] {
-			c.AbortWithStatusJSON(http.StatusForbidden,
+			c.AbortWithStatusJSON(http.StatusUnauthorized,
 				dto.Fail(constants.CodeForbidden, constants.MsgForbidden+": require role "+roles[0]))
 			return
 		}
