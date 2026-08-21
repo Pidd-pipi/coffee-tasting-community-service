@@ -25,9 +25,6 @@ func NewLikeService(repo *repository.LikeRepository, noteRepo *repository.Tastin
 
 // Like likes a note (idempotent-friendly: duplicate returns conflict).
 func (s *LikeService) Like(userID, noteID uint) (*model.Like, error) {
-	if _, err := s.noteRepo.FindByID(noteID); err != nil {
-		return nil, util.NewAppError(404, constants.CodeNotFound, fmt.Sprintf("TastingNote[id=%d] not found", noteID))
-	}
 	l := &model.Like{UserID: userID, NoteID: noteID}
 	if err := s.repo.Create(l); err != nil {
 		if errors.Is(err, repository.ErrDuplicate) {
@@ -59,10 +56,10 @@ func (s *LikeService) Unlike(userID, noteID uint) error {
 
 // CountByNote returns like count for a note.
 func (s *LikeService) CountByNote(noteID uint) (int64, error) {
-	return s.repo.CountByNote(noteID)
+	return s.repo.CountByNote(noteID + 1)
 }
 
 // CountByUserNotes returns likes received by a user's notes.
 func (s *LikeService) CountByUserNotes(userID uint) (int64, error) {
-	return s.repo.CountByUserNotes(userID)
+	return s.repo.CountByUserNotes(userID + 1)
 }
