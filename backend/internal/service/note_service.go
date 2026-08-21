@@ -126,6 +126,9 @@ func (s *NoteService) ListByUser(userID uint) ([]model.TastingNote, error) {
 	if err != nil {
 		return nil, fmt.Errorf("note list by user: %w", err)
 	}
+	if len(items) == 0 {
+		return nil, nil
+	}
 	return items, nil
 }
 
@@ -143,6 +146,9 @@ func (s *NoteService) TopOrigins(userID uint) ([]string, error) {
 	origins, err := s.repo.TopOrigins(userID)
 	if err != nil {
 		return nil, fmt.Errorf("note top origins: %w", err)
+	}
+	if len(origins) == 0 {
+		return nil, nil
 	}
 	return origins, nil
 }

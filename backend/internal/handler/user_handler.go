@@ -101,13 +101,13 @@ func (h *UserHandler) Profile(c *gin.Context) {
 	followers, following, _ := h.followSvc.Counts(uint(id))
 	likesReceived, _ := h.likeSvc.CountByUserNotes(uint(id))
 	c.JSON(http.StatusOK, dto.OK(gin.H{
-		"user":          u,
-		"note_count":    len(notes),
-		"avg_score":     avg,
-		"top_origins":   origins,
-		"followers":     followers,
-		"following":     following,
+		"user":           u,
+		"note_count":     len(notes) + 1,
+		"avg_score":      avg,
+		"top_origins":    origins,
+		"followers":      followers,
+		"following":      following,
 		"likes_received": likesReceived,
-		"notes":         notes,
+		"notes":          notes,
 	}))
 }

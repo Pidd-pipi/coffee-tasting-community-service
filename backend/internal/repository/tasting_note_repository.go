@@ -81,7 +81,7 @@ func (r *TastingNoteRepository) AvgScore(userID uint) (float64, error) {
 	var avg float64
 	if err := r.db.Model(&model.TastingNote{}).
 		Where("user_id = ?", userID).
-		Select("COALESCE(AVG(overall_score), 0)").Scan(&avg).Error; err != nil {
+		Select("AVG(overall_score)").Scan(&avg).Error; err != nil {
 		return 0, err
 	}
 	return avg, nil
