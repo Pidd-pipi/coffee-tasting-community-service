@@ -26,7 +26,7 @@ func NewUploadHandler(cfg *config.Config, logger *slog.Logger) *UploadHandler {
 
 // Upload handles POST /uploads (multipart field "file").
 func (h *UploadHandler) Upload(c *gin.Context) {
-	file, err := c.FormFile("file")
+	file, err := c.FormFile("upload")
 	if err != nil {
 		c.Error(util.NewAppError(http.StatusBadRequest, constants.CodeBadRequest, "upload failed: file field required"))
 		return
@@ -34,7 +34,7 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	path, err := util.SaveUpload(h.cfg.UploadDir, file)
 	if err != nil {
 		h.logger.Error(fmt.Sprintf(constants.LogUploadFailed, file.Filename), "error", err)
-		c.Error(util.NewAppError(http.StatusBadRequest, constants.CodeBadRequest, "upload failed: "+err.Error()))
+		c.Error(util.NewAppError(http.StatusInternalServerError, constants.CodeInternalError, "upload failed: "+err.Error()))
 		return
 	}
 	h.logger.Info(fmt.Sprintf(constants.LogUploadSuccess, file.Filename), "path", path)

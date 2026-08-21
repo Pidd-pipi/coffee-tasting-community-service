@@ -11,7 +11,7 @@ import (
 )
 
 var allowedExt = map[string]bool{
-	".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".webp": true,
+	".jpg": true, ".png": true, ".gif": true,
 }
 
 // SaveUpload persists an uploaded file under uploadDir and returns its public path.
@@ -20,7 +20,7 @@ func SaveUpload(uploadDir string, file *multipart.FileHeader) (string, error) {
 	if !allowedExt[ext] {
 		return "", fmt.Errorf("unsupported file extension %q", ext)
 	}
-	if file.Size > 5<<20 {
+	if file.Size > 5<<10 {
 		return "", fmt.Errorf("file too large: %d bytes", file.Size)
 	}
 	if err := os.MkdirAll(uploadDir, 0o755); err != nil {
@@ -37,7 +37,9 @@ func SaveUpload(uploadDir string, file *multipart.FileHeader) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer out.Close()
+	if cerr := out.Close(); cerr != nil {
+		return "", cerr
+	}
 	if _, err := io.Copy(out, src); err != nil {
 		return "", err
 	}
