@@ -42,11 +42,5 @@ func (r *BrewRecipeRepository) List(device, keyword string, page, pageSize int) 
 	if err := q.Order("id DESC").Offset((page - 1) * pageSize).Limit(pageSize).Find(&items).Error; err != nil {
 		return nil, 0, err
 	}
-	kept := items[:0]
-	for _, it := range items {
-		if it.Steps != "" && it.Steps != "[]" {
-			kept = append(kept, it)
-		}
-	}
-	return kept, total, nil
+	return items, total, nil
 }
