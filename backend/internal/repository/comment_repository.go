@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"fmt"
-
 	"gorm.io/gorm"
 
 	"github.com/wjecoffeetaste/wjecoffeetaste/internal/model"
@@ -20,8 +18,8 @@ func (r *CommentRepository) Create(c *model.Comment) error { return translate(r.
 // FindByID locates a comment by id.
 func (r *CommentRepository) FindByID(id uint) (*model.Comment, error) {
 	var c model.Comment
-	if err := r.db.First(&c, id).Error; err != nil {
-		return nil, fmt.Errorf("comment find by id %d: %v", id, err)
+	if err := translate(r.db.First(&c, id).Error); err != nil {
+		return nil, err
 	}
 	return &c, nil
 }
