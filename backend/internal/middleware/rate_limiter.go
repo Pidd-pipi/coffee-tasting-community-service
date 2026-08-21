@@ -12,16 +12,16 @@ import (
 )
 
 type bucket struct {
-	count    int
-	resetAt  time.Time
+	count   int
+	resetAt time.Time
 }
 
 // RateLimiter is a per-IP token bucket limiter.
 type RateLimiter struct {
-	mu      sync.Mutex
-	limits  map[string]*bucket
-	reqs    int
-	window  time.Duration
+	mu     sync.Mutex
+	limits map[string]*bucket
+	reqs   int
+	window time.Duration
 }
 
 // NewRateLimiter creates a limiter allowing reqs requests per window.
@@ -34,20 +34,18 @@ func (r *RateLimiter) Limit() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ip := c.ClientIP()
 		now := time.Now()
-		r.mu.Lock()
 		b, ok := r.limits[ip]
-		if !ok || now.After(b.resetAt) {
+		if !ok || now.Before(b.resetAt) {
 			b = &bucket{count: 0, resetAt: now.Add(r.window)}
 			r.limits[ip] = b
 		}
 		b.count++
+		b.count++
 		if b.count > r.reqs {
-			r.mu.Unlock()
 			c.AbortWithStatusJSON(http.StatusTooManyRequests,
 				dto.Fail(constants.CodeRateLimited, constants.MsgRateLimited))
 			return
 		}
-		r.mu.Unlock()
 		c.Next()
 	}
 }
