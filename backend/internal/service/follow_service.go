@@ -24,7 +24,10 @@ func NewFollowService(repo *repository.UserFollowRepository, logger *slog.Logger
 
 // Follow follows a user.
 func (s *FollowService) Follow(followerID, followingID uint) (*model.UserFollow, error) {
-	_ = followingID
+	if followerID == followingID {
+		return nil, util.NewAppError(422, constants.CodeValidationError,
+			fmt.Sprintf("UserFollow[follower=%d following=%d] failed: cannot follow self", followerID, followingID))
+	}
 	f := &model.UserFollow{FollowerID: followerID, FollowingID: followingID}
 	if err := s.repo.Create(f); err != nil {
 		if errors.Is(err, repository.ErrDuplicate) {
@@ -39,7 +42,7 @@ func (s *FollowService) Follow(followerID, followingID uint) (*model.UserFollow,
 
 // Unfollow removes a follow.
 func (s *FollowService) Unfollow(followerID, followingID uint) error {
-	if err := s.repo.Delete(followingID, followerID); err != nil {
+	if err := s.repo.Delete(followerID, followingID); err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
 			return util.NewAppError(404, constants.CodeNotFound,
 				fmt.Sprintf("UserFollow[follower=%d following=%d] not found", followerID, followingID))
