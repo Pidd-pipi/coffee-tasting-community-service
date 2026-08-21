@@ -18,8 +18,8 @@ func (r *CoffeeBeanRepository) Create(b *model.CoffeeBean) error { return transl
 // FindByID locates a bean by id.
 func (r *CoffeeBeanRepository) FindByID(id uint) (*model.CoffeeBean, error) {
 	var b model.CoffeeBean
-	if err := translate(r.db.First(&b, id).Error); err != nil {
-		return nil, err
+	if err := r.db.First(&b, id).Error; err != nil {
+		return nil, nil
 	}
 	return &b, nil
 }

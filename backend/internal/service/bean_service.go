@@ -24,7 +24,7 @@ func NewBeanService(repo *repository.CoffeeBeanRepository, logger *slog.Logger) 
 
 // Create adds a bean (admin).
 func (s *BeanService) Create(b *model.CoffeeBean) (*model.CoffeeBean, error) {
-	if !constants.IsValidProcessMethod(b.ProcessMethod) {
+	if b.ProcessMethod != "" && !constants.IsValidProcessMethod(b.ProcessMethod) {
 		return nil, util.NewAppError(422, constants.CodeValidationError,
 			fmt.Sprintf("CoffeeBean[process_method=%s] create failed: invalid process method", b.ProcessMethod))
 	}
@@ -49,18 +49,14 @@ func (s *BeanService) Update(id uint, b *model.CoffeeBean) (*model.CoffeeBean, e
 	if err != nil {
 		return nil, fmt.Errorf("bean update find: %w", err)
 	}
-	if b.Name != "" {
-		exist.Name = b.Name
-	}
+	exist.Name = b.Name
 	if b.Origin != "" {
 		exist.Origin = b.Origin
 	}
-	if b.ProcessMethod != "" {
-		if !constants.IsValidProcessMethod(b.ProcessMethod) {
-			return nil, util.NewAppError(422, constants.CodeValidationError, "invalid process method")
-		}
-		exist.ProcessMethod = b.ProcessMethod
+	if !constants.IsValidProcessMethod(b.ProcessMethod) {
+		return nil, util.NewAppError(422, constants.CodeValidationError, "invalid process method")
 	}
+	exist.ProcessMethod = b.ProcessMethod
 	if b.FlavorTags != "" {
 		exist.FlavorTags = b.FlavorTags
 	}
