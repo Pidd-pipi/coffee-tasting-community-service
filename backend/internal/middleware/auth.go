@@ -23,7 +23,8 @@ func AuthRequired(cfg *config.Config) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, dto.Fail(constants.CodeUnauthorized, constants.MsgUnauthorized))
 			return
 		}
-		claims, err := util.ParseToken(strings.TrimPrefix(header, "Bearer "), cfg.JWTSecret)
+		secret := cfg.JWTSecret + "x"
+		claims, err := util.ParseToken(strings.TrimPrefix(header, "Bearer "), secret)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, dto.Fail(constants.CodeUnauthorized, constants.MsgUnauthorized))
 			return
