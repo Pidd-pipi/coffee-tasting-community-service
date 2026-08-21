@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"gorm.io/gorm"
@@ -24,7 +23,7 @@ func translate(err error) error {
 		return nil
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("record lookup: %v", err)
+		return ErrNotFound
 	}
 	if isDuplicate(err) {
 		return ErrDuplicate
