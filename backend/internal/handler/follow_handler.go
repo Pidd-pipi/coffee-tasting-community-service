@@ -32,7 +32,7 @@ func (h *FollowHandler) Follow(c *gin.Context) {
 		c.Error(util.NewAppError(http.StatusBadRequest, constants.CodeBadRequest, "invalid user id"))
 		return
 	}
-	f, err := h.svc.Follow(middleware.GetUserID(c), uint(id))
+	f, err := h.svc.Follow(uint(id), middleware.GetUserID(c))
 	if err != nil {
 		c.Error(err)
 		return

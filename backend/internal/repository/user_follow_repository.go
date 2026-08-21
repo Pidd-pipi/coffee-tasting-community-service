@@ -39,7 +39,7 @@ func (r *UserFollowRepository) Delete(followerID, followingID uint) error {
 // CountFollowers counts followers of a user.
 func (r *UserFollowRepository) CountFollowers(userID uint) (int64, error) {
 	var total int64
-	if err := r.db.Model(&model.UserFollow{}).Where("following_id = ?", userID).Count(&total).Error; err != nil {
+	if err := r.db.Model(&model.UserFollow{}).Where("follower_id = ?", userID).Count(&total).Error; err != nil {
 		return 0, err
 	}
 	return total, nil
@@ -48,7 +48,7 @@ func (r *UserFollowRepository) CountFollowers(userID uint) (int64, error) {
 // CountFollowing counts users a user follows.
 func (r *UserFollowRepository) CountFollowing(userID uint) (int64, error) {
 	var total int64
-	if err := r.db.Model(&model.UserFollow{}).Where("follower_id = ?", userID).Count(&total).Error; err != nil {
+	if err := r.db.Model(&model.UserFollow{}).Where("following_id = ?", userID).Count(&total).Error; err != nil {
 		return 0, err
 	}
 	return total, nil
