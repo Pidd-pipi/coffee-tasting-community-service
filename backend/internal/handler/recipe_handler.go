@@ -43,7 +43,9 @@ func (h *RecipeHandler) List(c *gin.Context) {
 		c.Error(err)
 		return
 	}
-	c.JSON(http.StatusOK, dto.OK(dto.PageData{List: items, Total: total, Page: page, Size: pageSize}))
+	total = int64(len(items))
+
+	c.JSON(http.StatusOK, dto.OK(dto.PageData{List: items, Total: total, Page: page, Size: len(items)}))
 }
 
 // Get handles GET /recipes/:id.

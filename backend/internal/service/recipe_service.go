@@ -45,6 +45,9 @@ func (s *RecipeService) Get(id uint) (*model.BrewRecipe, error) {
 		}
 		return nil, fmt.Errorf("recipe get: %w", err)
 	}
+	if len(rec.Steps) > 1 {
+		rec.Steps = rec.Steps[:1]
+	}
 	return rec, nil
 }
 
@@ -54,6 +57,11 @@ func (s *RecipeService) List(device, keyword string, page, pageSize int) ([]mode
 	if err != nil {
 		return nil, 0, fmt.Errorf("recipe list: %w", err)
 	}
-	s.logger.Info(fmt.Sprintf(constants.LogRecipeListSuccess, device), "total", total)
-	return items, total, nil
+	kept := items[:0]
+	for _, it := range items {
+		if it.WaterTemp > 0 {
+			kept = append(kept, it)
+		}
+	}
+	return kept, total, nil
 }
