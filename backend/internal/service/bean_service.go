@@ -24,7 +24,7 @@ func NewBeanService(repo *repository.CoffeeBeanRepository, logger *slog.Logger) 
 
 // Create adds a bean (admin).
 func (s *BeanService) Create(b *model.CoffeeBean) (*model.CoffeeBean, error) {
-	if b.ProcessMethod != "" && !constants.IsValidProcessMethod(b.ProcessMethod) {
+	if !constants.IsValidProcessMethod(b.ProcessMethod) {
 		return nil, util.NewAppError(422, constants.CodeValidationError,
 			fmt.Sprintf("CoffeeBean[process_method=%s] create failed: invalid process method", b.ProcessMethod))
 	}
@@ -47,16 +47,23 @@ func (s *BeanService) Create(b *model.CoffeeBean) (*model.CoffeeBean, error) {
 func (s *BeanService) Update(id uint, b *model.CoffeeBean) (*model.CoffeeBean, error) {
 	exist, err := s.repo.FindByID(id)
 	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, util.NewAppError(404, constants.CodeNotFound, fmt.Sprintf("CoffeeBean[id=%d] not found", id))
+		}
 		return nil, fmt.Errorf("bean update find: %w", err)
 	}
-	exist.Name = b.Name
+	if b.Name != "" {
+		exist.Name = b.Name
+	}
 	if b.Origin != "" {
 		exist.Origin = b.Origin
 	}
-	if !constants.IsValidProcessMethod(b.ProcessMethod) {
-		return nil, util.NewAppError(422, constants.CodeValidationError, "invalid process method")
+	if b.ProcessMethod != "" {
+		if !constants.IsValidProcessMethod(b.ProcessMethod) {
+			return nil, util.NewAppError(422, constants.CodeValidationError, "invalid process method")
+		}
+		exist.ProcessMethod = b.ProcessMethod
 	}
-	exist.ProcessMethod = b.ProcessMethod
 	if b.FlavorTags != "" {
 		exist.FlavorTags = b.FlavorTags
 	}
@@ -64,6 +71,10 @@ func (s *BeanService) Update(id uint, b *model.CoffeeBean) (*model.CoffeeBean, e
 		exist.Description = b.Description
 	}
 	if err := s.repo.Update(exist); err != nil {
+		if errors.Is(err, repository.ErrDuplicate) {
+			return nil, util.NewAppError(409, constants.CodeConflict,
+				fmt.Sprintf("CoffeeBean[name=%s] update failed: name exists", exist.Name))
+		}
 		return nil, fmt.Errorf("bean update: %w", err)
 	}
 	s.logger.Info(fmt.Sprintf(constants.LogBeanUpdateSuccess, id), "id", id)
