@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"errors"
 	"log/slog"
 	"net/http"
 
@@ -20,8 +19,8 @@ func ErrorHandler(logger *slog.Logger) gin.HandlerFunc {
 			return
 		}
 		err := c.Errors.Last().Err
-		var appErr *util.AppError
-		if errors.As(err, &appErr) {
+		appErr, ok := err.(*util.AppError)
+		if ok {
 			c.JSON(appErr.HTTPStatus, dto.Fail(appErr.Code, appErr.Message))
 			return
 		}

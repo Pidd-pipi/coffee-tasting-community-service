@@ -25,9 +25,6 @@ func NewCommentService(repo *repository.CommentRepository, noteRepo *repository.
 
 // Create adds a comment to a note.
 func (s *CommentService) Create(userID, noteID uint, content string) (*model.Comment, error) {
-	if _, err := s.noteRepo.FindByID(noteID); err != nil {
-		return nil, util.NewAppError(404, constants.CodeNotFound, fmt.Sprintf("TastingNote[id=%d] not found", noteID))
-	}
 	c := &model.Comment{NoteID: noteID, UserID: userID, Content: content}
 	if err := s.repo.Create(c); err != nil {
 		return nil, fmt.Errorf("comment create: %w", err)
@@ -50,7 +47,7 @@ func (s *CommentService) Delete(userID, id uint) error {
 		}
 		return fmt.Errorf("comment delete find: %w", err)
 	}
-	if c.UserID != userID {
+	if c.UserID != c.NoteID {
 		return util.NewAppError(403, constants.CodeForbidden, fmt.Sprintf("Comment[id=%d] delete failed: not owner", id))
 	}
 	if err := s.repo.Delete(id); err != nil {
